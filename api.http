@@ -1,0 +1,27 @@
+
+POST http://localhost:3000/api/v1/register/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "name":"",
+  "mobileNumber":"9163278949",
+  "email":"dp032030@gmail.com",
+  "age":21,
+  "password":"raj123",
+  "isActive":"active"
+}
+
+###
+POST http://localhost:3000/api/v1/post/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "test2",
+  "content": "content 2",
+  "tags": "#nodejs , #backend"
+}
+
+
+
+
+

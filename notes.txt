@@ -1,0 +1,37 @@
+1:  Joi.object()
+-> we can validate object with specific structure 
+example: 
+const schema = Joi.object({
+  name: Joi.string().min(3).required(),
+  age: Joi.number().integer().min(18).required(),
+});
+
+2: Joi.string()
+-> we can validate that it is string or not.
+example: 
+Joi.string().required() // Must be a non-empty string
+Joi.string().email() // Must be a valid email
+Joi.string().pattern(/^[A-Za-z0-9]+$/) // Alphanumeric only
+
+
+3: Joi.number()
+-> validate it is nematic field or not ..
+-> Validates numbers and allows specific constraints.
+Example: 
+const schema = Joi.object({
+  price: Joi.number().min(0).max(1000).required(),
+  quantity: Joi.number().integer().positive(),
+});
+
+4: Joi.array()
+-> Ensures that a field is an array and applies constraints like length and content type.
+
+example: 
+const schema = Joi.object({
+  tags: Joi.array().items(Joi.string().min(3)).max(5),
+});
+const data = { tags: ['node', 'joi', 'validation'] };
+const { error, value } = schema.validate(data);
+
+5: Joi.required(), Joi.optional(), Joi.default()
+
