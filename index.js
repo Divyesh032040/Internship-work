@@ -7,21 +7,19 @@ const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 const helmet = require('helmet')
 
+const app = express();
 dotenv.config(); // Load environment variables
 
-// Create an Express application
-const app = express();
 
+//Middlewares
 app.use(morgan('combined'));
-app.use(express.json({limit:"16kb"}))
-app.use(express.urlencoded({extended:true,limit:"16kb"}))        
-app.use(cookieParser())
+app.use(express.json({limit:"16kb"}));
+app.use(express.urlencoded({extended:true,limit:"16kb"}));       
+app.use(cookieParser());
 app.use(helmet());
 
 //connecting with database
 connectDB()
-
-
 
 // Import routes
 const userRouter = require('./src/routes/user.route');
