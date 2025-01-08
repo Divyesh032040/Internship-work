@@ -3,12 +3,12 @@ POST http://localhost:3000/api/v1/register/ HTTP/1.1
 Content-Type: application/json
 
 {
-  "name":"",
+  "name":"Divyesh",
   "mobileNumber":"9163278949",
   "email":"dp032030@gmail.com",
-  "age":21,
-  "password":"raj123",
-  "isActive":"active"
+  "age":"21",
+  "password":"raj123"
+  
 }
 
 ###

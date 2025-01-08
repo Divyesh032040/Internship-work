@@ -8,7 +8,15 @@ const morgan = require('morgan')
 const helmet = require('helmet')
 
 const app = express();
-dotenv.config(); // Load environment variables
+
+dotenv.config();
+
+// console.log("PORT:", process.env.PORT);
+// console.log("MONGODB_URI:", process.env.MONGODB_URI);
+
+// console.log("REFRESH_TOKEN_SECRET:", process.env.REFRESH_TOKEN_SECRET);
+
+
 
 
 //Middlewares
@@ -36,8 +44,9 @@ app.get('/', (req, res) => {
 
 // Mount the user routes
 app.use('/api/v1', userRouter);
-app.use('/api/v1',router);
-app.use('/api/v1/' , uploadRoute);
+app.use('/api/v1' , uploadRoute);
+// app.use('api/v1' , userRouter);
+// app.use('api/v1' , userRouter)
 
 // Set the port for the server
 const PORT = process.env.PORT || 3000;

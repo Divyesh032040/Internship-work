@@ -25,10 +25,13 @@ const UserSchema = new Schema(
       type: Number,
       required: true
     },
-      password:{
+    password:{
         type:String,
         required:true
       },
+    refreshToken : {
+        type:String
+    }
     
     },
   { timestamps: true }
