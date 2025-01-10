@@ -9,11 +9,11 @@ const jwtAuth = async ( req , res , next ) => {
         if(!userToken){
             throw new Error("access token not found");
         }
-    
+        //we wil get payload of token
         const decodedToken = verifyToken(userToken);
     
         if(!decodedToken){
-            throw new Error("Unauthorized access")
+            throw new Error("Unauthorized access");
         }
 
         //fetch user via accessToken 

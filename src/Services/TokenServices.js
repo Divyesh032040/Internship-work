@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 //generate accessToken 
  function generateAccessTokens (payload) {
-  
+
     if(!payload){
         throw new Error("payload is required")
     }

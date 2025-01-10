@@ -25,6 +25,9 @@ app.use(express.json({limit:"16kb"}));
 app.use(express.urlencoded({extended:true,limit:"16kb"}));       
 app.use(cookieParser());
 app.use(helmet());
+app.use(express.static('public'))
+app.use(express.static('Student'))
+app.use(express.json());
 
 //connecting with database
 connectDB()
@@ -33,8 +36,8 @@ connectDB()
 const userRouter = require('./src/routes/user.route');
 const router = require('./src/routes/Post.route');
 const uploadRoute = require('./src/routes/upload.route');
-// Middleware to parse JSON requests
-app.use(express.json());
+const studentRoute = require('./src/routes/Student.route');
+
 
 
 // Define a route for the root URL
@@ -45,8 +48,8 @@ app.get('/', (req, res) => {
 // Mount the user routes
 app.use('/api/v1', userRouter);
 app.use('/api/v1' , uploadRoute);
-// app.use('api/v1' , userRouter);
-// app.use('api/v1' , userRouter)
+app.use('/api/v1' , studentRoute);
+
 
 // Set the port for the server
 const PORT = process.env.PORT || 3000;
