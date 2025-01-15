@@ -1,39 +1,39 @@
 
 const path = require('path');
 const fs = require('fs');
+const createError = require('http-errors');
 
-const registerStudent = async (req, res) => {
+const registerStudent = async (req, res , next) => {
     try {
         const { name, RollNumber, email, age } = req.body;
 
         // Validate required fields
         if (!name || !RollNumber || !email || !age) {
-            return res.status(400).json({ message: "All fields are required" });
+            // return res.status(400).json({ message: "All fields are required" });
+            return next(createError(400 , "all fields are required"));
         }
 
-        const apple = path.extname(__filename); console.log(apple);
-
-        // define base path for student data : current directory -> studentData/RollNumber
-        const studentBasePath = path.join(__dirname, 'StudentData', RollNumber);
-
-        // Create a folder named by the student's RollNumber
-        if (!fs.existsSync(studentBasePath)) {
-            fs.mkdirSync(studentBasePath, { recursive: true });
-        }
-
-        // Save student information into a file (e.g., `info.json`)
-        const studentInfo = { name, RollNumber, email, age };
-
-        const infoFilePath = path.join(studentBasePath, 'info.json');
-
-        fs.writeFileSync(infoFilePath, JSON.stringify(studentInfo, null, 2), 'utf-8');
-
+            // define base path for student data : current directory -> studentData/RollNumber
+            const studentBasePath = path.join(__dirname, 'StudentData', RollNumber);
+    
+            // Create a folder named by the student's RollNumber
+            if (!fs.existsSync(studentBasePath)) {
+                fs.mkdirSync(studentBasePath, { recursive: true });
+            }
+    
+            // Save student information into a file (e.g., `info.json`)
+            const studentInfo = { name, RollNumber, email, age };
+    
+            const infoFilePath = path.join(studentBasePath, 'info.json');
+    
+            fs.writeFileSync(infoFilePath, JSON.stringify(studentInfo, null, 2), 'utf-8');
+       
 
 
-        // Copy files from the public folder to the RollNumber directory
-        const publicFolderPath = path.join('public');
+            // Copy files from the public folder to the RollNumber directory
+            const publicFolderPath = path.join('public');
 
-        if (fs.existsSync(publicFolderPath)) {
+            if (fs.existsSync(publicFolderPath)) {
 
             //files array of all files of public folder
             const files = fs.readdirSync(publicFolderPath);
@@ -46,21 +46,14 @@ const registerStudent = async (req, res) => {
                     await fs.promises.rename(srcPath, destPath); // Move file
 
             }
+            } else {
+            next(createError(500 , "public folder dose not exist"));
+            }
 
-        } else {
-            console.warn('Public folder does not exist.');
-        }
-
-        res.json({ message: "Student registered successfully!" });
-    } catch (error) {
-        console.error('Error registering student:', error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+            res.json({ studentData : studentInfo , message: "Student registered successfully!" });
+            } catch (error) {
+                return next(createError(500 , "Fail to Store Student data : internal server Error"));
+            }
 };
 
-
-
-
-
-
-module.exports = { registerStudent };
+module.exports = {registerStudent}

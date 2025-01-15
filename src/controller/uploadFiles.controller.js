@@ -2,11 +2,18 @@
 
 const fs = require('fs');
 const path = require('path');
+const createError = require('http-errors');
 
-const uploadSingle = async (req, res) => {
+const uploadSingle = async (req, res , next) => {
   try {
+
+    const file = req.file
+
+    if(!file){
+      return next(createError(400 , "Files not received"))
+    }
     // Log the uploaded file data
-    console.log(req.file);
+    // console.log(req.file);
 
     const imgType = req.file.mimetype;
     const imgSize = req.file.size;
@@ -38,12 +45,12 @@ const uploadSingle = async (req, res) => {
     await fs.promises.mkdir(destDir, { recursive: true }); 
 
     // Move the file to the new directory
+    
     try {
-        await fs.promises.rename(oldPath, newPath);
-
-    } catch (error) {
-        console.error('Error during file upload:', err);
-        return res.status(500).json({ message: "An error occurred during file upload", error: err.message });
+      await fs.promises.rename(oldPath, newPath);
+      console.log('File renamed successfully');
+    } catch (err) {
+      return next(createError(500 , "fail to rename files"));
     }
 
     return res.status(200).json({ 

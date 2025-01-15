@@ -6,18 +6,11 @@ const connectDB = require("./src/database/db")
 const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 const helmet = require('helmet')
+const ErrorHandler = require('./src/Middleware/ErrorHandler');
 
 const app = express();
 
 dotenv.config();
-
-// console.log("PORT:", process.env.PORT);
-// console.log("MONGODB_URI:", process.env.MONGODB_URI);
-
-// console.log("REFRESH_TOKEN_SECRET:", process.env.REFRESH_TOKEN_SECRET);
-
-
-
 
 //Middlewares
 app.use(morgan('combined'));
@@ -38,8 +31,6 @@ const router = require('./src/routes/Post.route');
 const uploadRoute = require('./src/routes/upload.route');
 const studentRoute = require('./src/routes/Student.route');
 
-
-
 // Define a route for the root URL
 app.get('/', (req, res) => {
   res.send('Hello, World!');
@@ -50,6 +41,9 @@ app.use('/api/v1', userRouter);
 app.use('/api/v1' , uploadRoute);
 app.use('/api/v1' , studentRoute);
 
+
+//Global Error Handling Middleware
+app.use(ErrorHandler); 
 
 // Set the port for the server
 const PORT = process.env.PORT || 3000;

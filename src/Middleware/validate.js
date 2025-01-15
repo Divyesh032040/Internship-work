@@ -17,6 +17,7 @@ const validate = (schema) => {
                 message: "Validation failed",
                 details: error.details.map(err => err.message)
             });
+            
         }
 
         req.body = value; 
