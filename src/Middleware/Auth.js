@@ -1,35 +1,38 @@
-const User = require('../model/User.model');
-const {verifyToken} = require("../Services/TokenServices");
 
-const jwtAuth = async ( req , res , next ) => {
+const User = require('../model/Student.Model');
+const { verifyToken } = require("../Services/TokenServices");
 
+const jwtAuth = async (req, res, next) => {
     try {
-        const userToken = req.cookies?.accessToken || req.header("Authentication")?.replace("Bearer ","");
-    
-        if(!userToken){
-            throw new Error("access token not found");
-        }
-        //we wil get payload of token
-        const decodedToken = verifyToken(userToken);
-    
-        if(!decodedToken){
-            throw new Error("Unauthorized access");
+        // Get token from headers
+        const userToken = req.header("Authorization")?.replace("Bearer ", "");
+
+        if (!userToken) {
+            return res.status(401).json({ message: "Access token not found" });
         }
 
-        //fetch user via accessToken 
-        const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
-    
-        if(!user){
-            throw new Error("invalid access token found");
+        // Verify the token and decode its payload
+        const decodedToken = verifyToken(userToken);
+
+        if (!decodedToken) {
+            return res.status(401).json({ message: "Unauthorized access" });
         }
-    
+
+        const userId = decodedToken?.id || decodedToken?._id;
+
+        // Fetch the user from the database using the token payload
+        const user = await User.findById(userId).select("-password");
+
+        if (!user) {
+            return res.status(401).json({ message: "Invalid access token" });
+        }
+
         req.user = user;
-    
         next();
-        
     } catch (error) {
-        throw new Error(error);
+        console.error("Authentication Error:", error.message);
+        res.status(401).json({ message: error.message });
     }
-}
+};
 
 module.exports = jwtAuth;

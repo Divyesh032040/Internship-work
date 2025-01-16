@@ -8,8 +8,7 @@ const student = joi.object({
         .min(3)
         .max(30)
         .required(),
-    RollNumber: joi.string()
-        .max(12)
+    rollNumber: joi.string()
         .required(),
     email: joi.string()
         .email()
@@ -17,6 +16,8 @@ const student = joi.object({
     age: joi.number()
         .min(16)
         .max(100)
+        .required(),
+    password: joi.string()
         .required()
 });
 

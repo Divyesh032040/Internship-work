@@ -10,7 +10,7 @@ const UserSchema = new Schema(
       unique:false
 
     },
-    mobileNumber: {
+    rollNumber: {
       type: String,
       required: true, 
       unique: false,
@@ -31,6 +31,14 @@ const UserSchema = new Schema(
       },
     refreshToken : {
         type:String
+    },
+    profilePath:{
+      type:String,
+      required:true
+    },
+    gradeHistoryPath:{
+      type:String,
+      required:true
     }
     
     },

@@ -1,141 +1,62 @@
 
-const User = require("../model/User.model")
-const bcrypt = require('bcryptjs');
-const {encryption , passwordValidate} = require("../Services/userService")
-const cookie = require("cookie");
-const {
-    generateAccessTokens , 
-    generateRefreshToken , 
-    verifyToken , 
-    deleteToken , 
-    updateRefreshToken , 
-    newAccessToken
-} = require('../Services/TokenServices');
+const path = require('path');
+const fs = require('fs');
+const createError = require('http-errors');
 
 
-const register = async (req , res) => {
+//create user
+const registerStudent = async (req, res , next) => {
+    try {
+        const { name, RollNumber, email, age } = req.body;
 
-    const userData = req.body;
-
-    if(!userData){
-        return res.status(400).json({"message":"user data is required"})
-    }
-
-    const {name , mobileNumber , email , age , password} = userData
-
-    const isEmailAvailable = await User.findOne({ email });
-    if (isEmailAvailable) {
-        return res.status(400).json({message:"User with this Email already registered"})
-    }
-
-    const hashedPassword = await encryption(password);
-
-
-    const user = await User.create({
-        name:name,
-        mobileNumber:mobileNumber,
-        email,
-        age,
-        password:hashedPassword,
-    })
-
-    res.status(200).json({ message: "User registered successfully!", data: user });
-}
-
-
-const login = async (req, res, next) => {
-        try {
-        const { email, password } = req.body;
-    
-        // Validate input
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required" });
-        }
-    
-        // Find user in the database
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: "No account found with this email" });
-        }
-    
-        // Compare passwords
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) {
-            return res.status(401).json({ message: "Incorrect password" });
-        }
-    
-        // Generate tokens
-        const accessToken = generateAccessTokens({ id: user._id });
-        const refreshToken = generateRefreshToken({ id: user._id });
-    
-        // Save refresh token to the database
-        user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave : false })
-    
-        // Set cookies
-        res
-            .cookie("refreshToken", refreshToken, {
-            maxAge: 1000 * 60 * 60 * 24, 
-            httpOnly: true,
-            secure: true, 
-            })
-            .cookie("accessToken", accessToken, {
-            maxAge: 1000 * 60 * 60 * 24, 
-            httpOnly: true,
-            secure: true,
-            })
-            .status(200)
-            .json({
-            user: { name: user.name, email: user.email, _id: user._id },
-            message: "User logged in successfully",
-            });
-        } catch (error) {
-        console.log(error);
-        }
-    };
-
-    const logout = async (req , res) => {
-        const user = req.user;
-        const userId = user?._id;
-        const dbUser = await User.findById(userId);
-        if(!dbUser){
-            return res.status(400).json({message:"user not found"});
+        // Validate required fields
+        if (!name || !RollNumber || !email || !age) {
+            // return res.status(400).json({ message: "All fields are required" });
+            return next(createError(400 , "all fields are required"));
         }
 
-        //remove refreshToken field from document
-        await User.findByIdAndUpdate(
-            userId, 
-            {
-                $unset: { refreshToken: 1 }
-            },
-            {
-                new: true
+            // define base path for student data : current directory -> studentData/RollNumber
+            const studentBasePath = path.join(__dirname, 'StudentData', RollNumber);
+    
+            // Create a folder named by the student's RollNumber
+            if (!fs.existsSync(studentBasePath)) {
+                fs.mkdirSync(studentBasePath, { recursive: true });
             }
-        );
-
-        //remove cookies 
-        const option = {
-            httpOnly: true,
-            secure: true
-        };
-        
-        return res
-            .status(200)
-            .clearCookie("accessToken", option)
-            .clearCookie("refreshToken", option)
-            .json({message:"user logout successfully"})
-    }
+    
+            // Save student information into a file (e.g., `info.json`)
+            const studentInfo = { name, RollNumber, email, age };
+    
+            const infoFilePath = path.join(studentBasePath, 'info.json');
+    
+            fs.writeFileSync(infoFilePath, JSON.stringify(studentInfo, null, 2), 'utf-8');
 
 
+            // Copy files from the public folder to the RollNumber directory
+            const publicFolderPath = path.join('public');
 
-module.exports = {register , login , logout }
+            if (fs.existsSync(publicFolderPath)) {
 
-
-
-
-
-
-
+            //files array of all files of public folder
+            const files = fs.readdirSync(publicFolderPath);
 
 
+            for (const file of files) {
+                const srcPath = path.join(publicFolderPath, file);
+                const destPath = path.join(studentBasePath, file);
 
+                    await fs.promises.rename(srcPath, destPath); // Move file
+
+            }
+            } else {
+            next(createError(500 , "public folder dose not exist"));
+            }
+
+            res.json({ studentData : studentInfo , message: "Student registered successfully!" });
+            } catch (error) {
+                return next(createError(500 , "Fail to Store Student data : internal server Error"));
+            }
+};
+
+//readUser
+
+module.exports = {registerStudent}

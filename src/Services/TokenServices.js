@@ -31,11 +31,12 @@ function generateRefreshToken(payload){
 
 //verify tokens and return payload
 function verifyToken (userToken){
-    if(!token){
+    if(!userToken){
         throw new Error("Invalid input : token is required");
     }
     try {
-        const payload = jwt.verify(userToken , process.env.TOKEN_SECRET);
+        const payload = jwt.verify(userToken , process.env.JWT_SECRET);
+       
         return payload;
     } catch (error) {
         console.log(error);
